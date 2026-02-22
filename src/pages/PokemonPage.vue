@@ -1,4 +1,6 @@
 <template>
+<div class="poke-game">
+
 
     <h1 v-if="!pokemon">Espere por favor...</h1>
 
@@ -23,7 +25,7 @@
 
  </div>
 
-
+</div>
 </template>
 
 <script>
@@ -46,7 +48,8 @@ export default {
         pokemon: null,
         showPokemon: false,
         showAnswer: false,
-        message:''
+        message:'',
+        score:0
       }
     },
     methods:{
@@ -57,18 +60,19 @@ export default {
          this.pokemon = this.pokemonArr[rndInt]
      
       },
-      checkAnswer(selectedId ){
-        this.showPokemon = true
-        this.showAnswer = true
+     checkAnswer(selectedId) {
+    this.showPokemon = true;
+    this.showAnswer = true;
 
-        if(selectedId === this.pokemon.id) {
-          this.message = `Correcto, ${this.pokemon.name }`
-       
-       }else{
-        this.message =`Lo lamento!! intentalo otra vez` 
-          
-        }
-      },
+    if (selectedId === this.pokemon.id) {
+      this.message = `Correcto, ${this.pokemon.name}`;
+      this.score++; // <-- Suma un punto si acierta
+    } else {
+      this.message = `Lo lamento!! era ${this.pokemon.name}`;
+      this.score = 0; // <-- Opcional: Reinicia el contador si falla
+    }
+  },
+        
       newGame(){
 
         this.showPokemon = false
@@ -91,5 +95,15 @@ export default {
 </script>
 
 <style>
+.poke-game {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centra todo el bloque en la pantalla */
+  align-items: center;
+  min-height: 80vh;      /* Ocupa todo el alto de la ventana */
+  padding: 20px;
+}
+
+
 
 </style>
