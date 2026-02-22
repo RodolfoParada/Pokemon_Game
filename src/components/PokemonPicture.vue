@@ -1,60 +1,45 @@
-
 <template>
    <div class="pokemon-container">
-      
-      <img :src="imgSrc" 
+      <img :src="image" 
          class="hidden-pokemon"
          alt="pokemon"> 
 
        <img v-if="showPokemon"
-          :src="imgSrc" 
+          :src="image" 
           class="fade-in"
           alt="pokemon"> 
    </div>
-  
 </template>
 
 <script>
-
-
 export default {
-    props:{
-        pokemonId:{
-            type: Number,
-            require: true
-        },
-        showPokemon:{
-            type: Boolean,
-            require:true,
-            default: false
-        }
-    },
-    computed:{
-    imgSrc(){
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${ this.pokemonId }.svg`
-    },
-  }
+    props: {
+        pokemonId: { type: Number, required: true },
+        showPokemon: { type: Boolean, required: true },
+        image: { type: String, required: true } // Esta es la URL de alta calidad
+    }
+    // Eliminamos computed: imgSrc ya que no la necesitamos
 }
-
-
 </script>
 
-<style scope>
+<style scoped>
 .pokemon-container {
     height: 200px;
+    display: flex;
+    justify-content: center; /* Centrado profesional con Flexbox */
+    position: relative;
+    width: 100%;
 }
+
 img {
     height: 200px;
     position: absolute;
-    right: 32%;
+    /* Eliminamos right: 32% para que el centrado de arriba funcione */
     user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     -webkit-user-drag: none;
-    -webkit-user-select: none;
 }
+
 .hidden-pokemon {
     filter: brightness(0);
 }
-
 </style>
