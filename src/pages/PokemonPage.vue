@@ -1,31 +1,20 @@
 <template>
-<div class="poke-game">
+  <div class="poke-game">
+    
+    <PokemonSkeleton v-if="!pokemon" />
 
+    <div v-else>
+       <h1>¿Quién es este pokemon?</h1>
+       <PokemonPicture :pokemonId="pokemon.id" :showPokemon="showPokemon"/>
+       <PokemonOptions :pokemons="pokemonArr" :answerId="pokemon.id" @selection="checkAnswer"/>
 
-    <h1 v-if="!pokemon">Espere por favor...</h1>
+       <template v-if="showAnswer">
+         <h2 class="fade-in">{{ message }}</h2>
+         <button @click="newGame">Nuevo Juego</button>
+       </template>
+    </div>
 
-
- <div v-else>
-   <h1>¿Quién es este pokemon?</h1>
-
-  <!--pokemonId lo recibe props de en PokemonId-->
-  <PokemonPicture  :pokemonId="pokemon.id" :showPokemon="showPokemon"/>
-  <PokemonOptions
-            :pokemons="pokemonArr "
-            @selection="checkAnswer"
-            />
-
-      <template v-if="showAnswer">
-      <h2 class="fade-in">{{ message }}</h2>
-
-       <button @click="newGame">
-        Nuevo Juego
-        </button>
-      </template>
-
- </div>
-
-</div>
+  </div>
 </template>
 
 <script>
@@ -33,6 +22,7 @@
 
 import PokemonPicture from '@/components/PokemonPicture';
 import PokemonOptions from '@/components/PokemonOptions';
+import PokemonSkeleton from '@/components/PokemonSkeleton.vue';
 
 import getPokemonOptions from '@/helpers/getPokemonOptions';
 // import { threadId } from 'worker_threads';
@@ -41,7 +31,11 @@ console.log(getPokemonOptions())
 
 
 export default {
-    components: { PokemonPicture, PokemonOptions },
+    components: { 
+      PokemonPicture, 
+      PokemonOptions,
+      PokemonSkeleton,
+    },
     data() {
       return {
         pokemonArr:[] ,
@@ -70,6 +64,20 @@ export default {
     } else {
       this.message = `Lo lamento!! era ${this.pokemon.name}`;
       this.score = 0; // <-- Opcional: Reinicia el contador si falla
+    }
+
+    if (this.pokemon.cry) {
+      const audio = new Audio(this.pokemon.cry);
+      audio.volume = 0.5; // Volumen al 50% para no asustar al usuario
+      audio.play();
+    }
+
+    if (selectedId === this.pokemon.id) {
+      this.message = `¡Correcto, ${this.pokemon.name}!`;
+      this.score++;
+    } else {
+      this.message = `¡Lo lamento! Era ${this.pokemon.name}`;
+      this.score = 0;
     }
   },
         
