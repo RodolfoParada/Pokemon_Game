@@ -1,16 +1,33 @@
 <template>
   <div class="poke-game">
     
-    <PokemonSkeleton v-if="!pokemon" />
+    <div v-if="!pokemonArr.length" class="gen-selector">
+        <h2>Selecciona tu Generación</h2>
+        <button @click="mixPokemonArray('kanto')">Kanto (Gen 1)</button>
+        <button @click="mixPokemonArray('johto')">Johto (Gen 2)</button>
+        <button @click="mixPokemonArray('all')">Todas</button>
+    </div>
+
+    <PokemonSkeleton v-else-if="!pokemon" />
 
     <div v-else>
        <h1>¿Quién es este pokemon?</h1>
-       <PokemonPicture :pokemonId="pokemon.id" :showPokemon="showPokemon"/>
-       <PokemonOptions :pokemons="pokemonArr" :answerId="pokemon.id" @selection="checkAnswer"/>
+       
+       <PokemonPicture 
+          :pokemonId="pokemon.id" 
+          :showPokemon="showPokemon"
+          :image="pokemon.img" 
+       />
+       
+       <PokemonOptions 
+          :pokemons="pokemonArr" 
+          :answerId="pokemon.id" 
+          @selection="checkAnswer"
+       />
 
        <template v-if="showAnswer">
          <h2 class="fade-in">{{ message }}</h2>
-         <button @click="newGame">Nuevo Juego</button>
+         <button @click="newGame">Siguiente Pokémon</button>
        </template>
     </div>
 
@@ -43,17 +60,19 @@ export default {
         showPokemon: false,
         showAnswer: false,
         message:'',
-        score:0
+        score:0,
+        currentGen: null
       }
     },
     methods:{
-     async mixPokemonArray() {
-         this.pokemonArr = await getPokemonOptions()
-       
-         const rndInt = Math.floor( Math.random() * 4 )
-         this.pokemon = this.pokemonArr[rndInt]
-     
-      },
+ async mixPokemonArray(gen = 'all') {
+    this.currentGen = gen; // Guardamos la gen elegida
+    this.pokemon = null;
+    this.pokemonArr = await getPokemonOptions(gen);
+   
+    const rndInt = Math.floor(Math.random() * 4);
+    this.pokemon = this.pokemonArr[rndInt];
+},
      checkAnswer(selectedId) {
     this.showPokemon = true;
     this.showAnswer = true;
@@ -87,12 +106,13 @@ export default {
         this.showAnswer = false
         this.pokemonArr = []
         this.pokemon = null
-        this.mixPokemonArray()
+       // Llamamos a la mezcla usando la última generación guardada
+    // this.mixPokemonArray(this.currentGen);
 
       }
     },
    mounted(){
-      this.mixPokemonArray()
+      // this.mixPokemonArray()
       }
 
 

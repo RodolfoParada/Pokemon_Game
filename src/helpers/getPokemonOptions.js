@@ -1,41 +1,45 @@
-import pokemonApi from "@/api/pokemonApi"
+import { getPokemonData } from "@/api/pokemonApi";
 
-const getPokemons = () => {
-    const pokemonArr = Array.from(Array(1000))
-    return pokemonArr.map(( _ , index ) => index + 1)
+// 1. Definimos las constantes de las generaciones (Escalabilidad)
+export const GENERATIONS = {
+    all:   { min: 1, max: 650 },
+    kanto: { min: 1, max: 151 },
+    johto: { min: 152, max: 251 },
+    hoenn: { min: 252, max: 386 }
+};
+
+// 2. Función para crear el arreglo de IDs basado en el rango
+const getPokemons = (min, max) => {
+    const length = max - min + 1;
+    const pokemonArr = Array.from(Array(length));
+    return pokemonArr.map((_, index) => index + min);
 }
 
-const getPokemonOptions = async() => {
+// 3. Función principal que exportamos
+const getPokemonOptions = async (gen = 'all') => {
+    // Obtenemos min y max según la generación elegida
+    const { min, max } = GENERATIONS[gen] || GENERATIONS.all;
     
+    // Generamos y mezclamos los IDs
+    const mixedPokemons = getPokemons(min, max)
+                           .sort(() => Math.random() - 0.5);
    
-    const mixedPokemons = getPokemons()
-                           .sort( () => Math.random() - 0.5)
-   
-    const pokemons = await getPokemonNames(mixedPokemons.splice(0, 4) )
-   
-    return pokemons
+    // Tomamos los primeros 4 y buscamos sus nombres/datos
+    return await getPokemonNames(mixedPokemons.splice(0, 4));
 }
 
-const getPokemonNames = async( [a,b,c,d] = [] ) => {
- 
+// 4. Función que realiza las peticiones simultáneas
+const getPokemonNames = async ([a, b, c, d] = []) => {
+    // Aquí usamos la función especializada que definimos en pokemonApi.js
     const promiseArr = [
-        pokemonApi.get(`/${ a } `),
-        pokemonApi.get(`/${ b } `),
-        pokemonApi.get(`/${ c } `),
-        pokemonApi.get(`/${ d } `),
-]
+        getPokemonData(a),
+        getPokemonData(b),
+        getPokemonData(c),
+        getPokemonData(d),
+    ];
 
-const [p1,p2,p3,p4 ] = await Promise.all(promiseArr)
-
-return [
-  
-
-    { name: p1.data.name, id: p1.data.id, cry: p1.data.cries.latest },
-    { name: p2.data.name, id: p2.data.id, cry: p2.data.cries.latest },
-    { name: p3.data.name, id: p3.data.id, cry: p3.data.cries.latest },
-    { name: p4.data.name, id: p4.data.id, cry: p4.data.cries.latest },
-]
-
-
+    // Promise.all espera a que las 4 peticiones terminen
+    return await Promise.all(promiseArr);
 }
-export default getPokemonOptions
+
+export default getPokemonOptions;
