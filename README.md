@@ -1,6 +1,7 @@
-# pokemon-game
+### pokemon-game
+#### Es un pequeño juego con vidas y un limite de puntos para ganar usando la api de Pokemon.
 
-## Project setup
+### Project setup
 ```
 npm install
 ```
